@@ -37,7 +37,7 @@
     "mockingoose": "^2.15.2",
     "mongodb": "^3.6.6",
     "mongoose": "^5.12.5",
-    "nodemon": "^2.0.7",
+    "nodemon": "^2.0.9",
     "react": "^16.14.0",
     "react-dev": "^0.0.1",
     "react-dom": "^16.4.0",

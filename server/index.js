@@ -32,7 +32,36 @@ app.get('/api/summaries/:bookIds', async (req, res) => {
   })
 });
 
-let port = process.env.port || 1220;
+app.post('/api/summary', (req, res) => {
+  let newSummary = new db.Summary(req.body)
+  newSummary.save()
+  .then(() => {
+    res.sendStatus(200)
+  })
+  .catch(() => {
+    res.sendStatus(500)
+  })
+})
+
+// app.put('/api/summary/:bookId', (req, res) => {
+//   const id = req.params.bookId;
+//   db.Summary.updateOne({id}, )
+// })
+
+app.delete('/api/summary/:bookId', async (req, res) => {
+  db.Summary.deleteOne({id: req.params.bookId})
+  .then(() => {
+    console.log('Deleted')
+    res.send(200)
+  })
+  .catch((err) => {
+    console.log(err)
+    res.send(500)
+  })
+})
+
+
+let port = 1220;
 if(!module.parent){
 app.listen(port, function () {
   console.log(`listening on port ${port}`);

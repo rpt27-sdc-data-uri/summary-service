@@ -19,6 +19,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _assets_styles_scss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_assets_styles_scss__WEBPACK_IMPORTED_MODULE_3__);
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function _readOnlyError(name) { throw new TypeError("\"" + name + "\" is read-only"); }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -73,7 +75,12 @@ var App = /*#__PURE__*/function (_React$Component) {
 
       var query = new URLSearchParams(location.search);
       var bookId = query.get('bookId');
-      fetch("http://18.188.135.5:1220/api/summary/".concat(bookId)).then(function (response) {
+
+      if (bookId = (_readOnlyError("bookId"), null)) {
+        bookId = (_readOnlyError("bookId"), '0');
+      }
+
+      fetch("http://localhost:1220/api/summary/".concat(bookId)).then(function (response) {
         return response.json();
       }).then(function (data) {
         return _this2.setState({
@@ -91,10 +98,10 @@ var App = /*#__PURE__*/function (_React$Component) {
       if (this.state.summaries.length <= 0) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
           style: {
-            color: "blue",
-            padding: "25px",
-            fontFamily: "Arial",
-            textalign: "center"
+            color: 'blue',
+            padding: '25px',
+            fontFamily: 'Arial',
+            textalign: 'center'
           }
         }, "Oops \u2014 we can\u2019t find the page you\u2019re looking for. Head back to the homepage and try again with another book!");
       } else {
