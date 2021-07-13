@@ -2,6 +2,7 @@ const compression = require('compression');
 const express = require('express');
 const bodyParser = require('body-parser');
 const db = require('../database/index.js');
+const pool = require('../postgres.js')
 let app = express();
 app.use(compression({threshold : 0 }))
 app.use(express.static(__dirname + '/../public'));
@@ -32,7 +33,7 @@ app.get('/api/summaries/:bookIds', async (req, res) => {
   })
 });
 
-app.post('/api/summary', (req, res) => {
+app.post('/api/create/summary', (req, res) => {
   let newSummary = new db.Summary(req.body)
   newSummary.save()
   .then(() => {
