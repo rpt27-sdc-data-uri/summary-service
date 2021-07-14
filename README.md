@@ -49,6 +49,10 @@ The server with two endpoints are located in server/index.js. The first endpoint
 
 The second endpont`http://localhost:1220/api/summaries/:bookIds` will accept array of book ids and returns an array of objects with the following data for each of the book ids {id: Number, summary: String, short_summary: String, copyright: String}
 
+The third endpoint is '/api/create/summary' This endpoint will accept a request body with the keys of id, summary, short_summary, and copyright. This will be saved to the database as a new record.
+
+The fourth endpoint is '/api/delete/summary/:bookId' This endpoint will take the provided bookId, search for it in the database and delete that record.
+
 ### Usage
 Clone the repository from github into your local machine to make edits.
 Code is available to view on github at https://github.com/huang-pei-mei/FEC-Publishers-Summary.
@@ -70,6 +74,8 @@ Make sure nodemon is installed on your system and then from the root directory:
 
 npm run start
 Runs the app in the development mode. Open http://localhost:1220 to view it in the browser.
+
+
 
 ## Technologies Used
   JavaScript
