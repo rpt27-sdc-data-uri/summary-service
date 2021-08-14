@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Summary from './Summary.jsx';
+import axios from 'axios';
 import '../assets/styles.scss';
 
 class App extends React.Component {
@@ -14,16 +15,21 @@ class App extends React.Component {
   componentDidMount() {
     this.getBookSummary();
   }
+
   getBookSummary() {
     const query = new URLSearchParams(location.search);
-    const bookId = query.get('bookId');
-    if (bookId = null) {
-      bookId = '0';
+    console.log(query);
+    let bookId = query.get('bookId');
+    console.log(bookId);
+    if (bookId === null) {
+      bookId = '1';
     }
-    fetch(`http://localhost:1220/api/summary/${bookId}`)
-      .then((response) => response.json())
-      .then(data => this.setState({ summaries: data }))
-      .catch(err => this.setState({ summaries: [] }));
+    axios.get(`http://localhost:1220/api/summary/${bookId}`)
+      .then((response) => {
+        console.log(response.data);
+        this.setState({summaries: response.data});
+      })
+      .catch(err => console.log(err));
   }
   render() {
     if (this.state.summaries.length <= 0) {

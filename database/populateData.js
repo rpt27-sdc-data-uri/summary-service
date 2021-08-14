@@ -21,7 +21,7 @@ const lorem = new LoremIpsum({
   suffix: " "
 });
 
-const createSummary = (index) => {
+const createSummary = () => {
   // for (let i = 0; i < 100; i++) {
   const paragraphLength = Math.floor(Math.random() * 2 + 2);
   const shortSummarySentenceLength = Math.floor(Math.random() * 4 + 3);
@@ -32,15 +32,15 @@ const createSummary = (index) => {
   short_summary = short_summary.replace(/\n/g,' ');
   const year = Math.floor(Math.random() * 81) + 1940;
   const copyright = '©' + year + ' ' + lorem.generateWords(copyrightWordsLength) + ' (P)' + (year + Math.floor(Math.random() * 5 + 4)) + ' ' + lorem.generateWords(copyrightWordsLength);
-  let row = `${index},${summary},${short_summary},${copyright}\n`;
+  let row = `${summary},${short_summary},${copyright}\n`;
   return row;
   // }
 };
 
-async function writeToCsvFile() {
+function writeToCsvFile() {
   let rows = 10000000;
   for (let index = 0; index <= rows; index++) {
-    stream.write(await createSummary(index), 'utf-8')
+    stream.write(createSummary(), 'utf-8')
   }
   stream.end();
 }
@@ -79,7 +79,7 @@ function seedDatabase() {
     )
   )
   .on('end', () => {
-    const query = "COPY summaries (id, summary, short_summary, copyright) FROM '/Users/alonzosanchez/sdc/Summary-Service/summary.csv' WITH (FORMAT CSV, DELIMITER ',');"
+    const query = "COPY summary (summary, short_summary, copyright) FROM '/Users/alonzosanchez/sdc/Summary-Service/summary.csv' WITH (FORMAT CSV, DELIMITER ',');"
     // const query = 'INSERT INTO Summaries (id, summary, short_summary, copyright) VALUES ($1, $2, $3, $4)';
 
     db.connect((err,client, done) => {
@@ -120,6 +120,16 @@ async function seed() {
 //   stream.end();
 // });
 
+// const seeding = () => {
+//   for (let i = 0; i < 10; i++) {
+//     console.log('whats up');
+//     seed();
+//     console.log('ran')
+//   }
+//   return;
+// }
+
+// seeding();
 
 seed();
 
@@ -162,4 +172,11 @@ seed();
 
 
 // }
+CREATE TABLE summary (
+  bookId serial PRIMARY KEY,
+  summary TEXT,
+  short_summary TEXT,
+  copyright VARCHAR (50)
+)
 
+// D

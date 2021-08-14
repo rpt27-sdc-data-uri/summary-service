@@ -4,13 +4,13 @@ CREATE DATABASE summarydb;
 
 \c summarydb
 
-CREATE TABLE IF NOT EXISTS Summaries
+CREATE TABLE IF NOT EXISTS Summary
 (
-  id SERIAL PRIMARY KEY,
+  bookId SERIAL PRIMARY KEY,
   summary TEXT,
   short_summary TEXT,
   copyright TEXT
 );
 
-ALTER TABLE Summaries
+ALTER TABLE Summary
   OWNER to postgres;

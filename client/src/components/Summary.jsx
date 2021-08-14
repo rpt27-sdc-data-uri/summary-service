@@ -8,7 +8,7 @@ const Summary = (props) => (
       props.summaries.map((summary, index) => {
         return (
           < BookSummary summary={summary} key={index} />
-        )
+        );
       })
     }
   </div>
