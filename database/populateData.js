@@ -3,7 +3,7 @@
 // const fs = require('fs');
 // const fastcsv = require('fast-csv')
 // const args = require('minimist')(process.argv.slice(2));
-// const currentDirectory = process.cwd();
+const currentDirectory = process.cwd();
 // const csvWriter = require("csv-write-stream");
 // const writer = csvWriter();
 // // const pgp = require('pg-promise')({
@@ -211,10 +211,8 @@ const createSummary = () => {
 
 };
 
-const summary = new pgp.helpers.ColumnSet
-
 function writeToCsvFile() {
-  let rows = 1000000;
+  let rows = 1000;
   for (let index = 0; index <= rows; index++) {
     stream.write(createSummary(), 'utf-8')
   }
@@ -241,20 +239,27 @@ async function seed() {
           port: 5432
         });
 
-      const query =
-        "INSERT INTO summary (summary, short_summary, copyright) VALUES ($1, $2, $3)";
+        const query = `COPY summary (summary, short_summary, copyright) FROM '${currentDirectory}/summaries.csv' WITH (FORMAT CSV, DELIMITER ',');`
 
       pool.connect((err, client, done) => {
         if (err) throw err;
 
         try {
-          csvData.forEach(row => {
-            client.query(query, row, (err, res) => {
-              if (err) {
-                console.log(err.stack);
-              }
-            });
-          });
+          // csvData.forEach(row => {
+          //   client.query(query, row, (err, res) => {
+          //     if (err) {
+          //       console.log(err.stack);
+          //     }
+          //   });
+          // });
+          client.query(query)
+          .then((res) => {
+            console.log('done')
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+
         } finally {
           done();
         }
