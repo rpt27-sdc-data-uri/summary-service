@@ -1,13 +1,185 @@
+// const db = require('./postgres.js');
+// const contains = require('validator/lib/contains');
+// const fs = require('fs');
+// const fastcsv = require('fast-csv')
+// const args = require('minimist')(process.argv.slice(2));
+// const currentDirectory = process.cwd();
+// const csvWriter = require("csv-write-stream");
+// const writer = csvWriter();
+// // const pgp = require('pg-promise')({
+// //   capSQL: true
+// // });
+
+// // const connectionObject = {
+// //   user: 'postgres',
+// //   host: '13.58.242.41',
+// //   database: 'postgres',
+// //   password: 'postgres',
+// //   port: 5432,
+// //   idleTimeoutMillis: 0,
+// //   connectionTimeoutMillis: 0
+// // }
+// // const db = pgp(connectionObject);
+
+// // function summarySeed () {
+// //   console.log('seeding')
+// //   db.tx('massive-insert', t => {
+// //     const processData = data => {
+// //       if (data) {
+// //         const insert = pgp.helpers.insert(data, summary);
+// //         return t.none(insert);
+// //       }
+// //     };
+// //     return t.sequence(index => createSummary().then(processData))
+// //   })
+// //   .then(data => {
+
+// //     console.log('Total reviews batches:', data.total, ', Duration:', data.duration);
+// // })
+// //   .catch(error => {
+
+// //     console.log(error);
+// //   });
+// // }
+
+// // summarySeed();
+
+
+// const lorem = new LoremIpsum({
+//   sentencesPerParagraph: {
+//     max: 6,
+//     min: 4
+//   },
+//   wordsPerSentence: {
+//     max: 16,
+//     min: 8
+//   },
+//   suffix: " "
+// });
+
+
+
+// // seedPostgresSummaryCSV = () => {
+// //   console.log(" -- postgres books create csv started -- ");
+
+// //   const createCsvFile = () => {
+// //     writer.pipe(fs.createWriteStream(`./summary.csv`));
+
+// //     for (var i = 1; i <= 10000; i++) {
+// //       console.log("id", i);
+// //       writer.write({
+// //         summary: lorem.generateParagraphs(2),
+// //         short_summary: lorem.generateParagraphs(1),
+// //         copyright: '©' + 1998 + ' ' + lorem.generateWords(2)
+// //       });
+// //     }
+
+// //     writer.end();
+// //     console.log(" -- postgres summary create csv done -- ");
+// //   };
+
+// //   return new Promise((resolve, reject) => {
+// //     resolve(createCsvFile());
+// //   })
+// //     .then(() => {
+// //       return this.seedPostgresSaveCSV("summary", "summary");
+// //     })
+// //     .then((value) => {
+// //       console.log(
+// //         " -- postgres save csv query query end --",
+// //         value.command,
+// //         "-",
+// //         value.rowCount
+// //       );
+// //       postgres.end();
+// //     })
+// //     .catch((error) => {
+// //       console.log("database seeding", error);
+// //     });
+// // };
+
+// // const seedPostgresSummary = async (table, csvFile) => {
+// //   const summaries = await db.query(
+// //     `COPY ${table} (summary, short_summary, copyright) FROM '${currentDirectory}/${csvFile}.csv' WITH (FORMAT CSV, HEADER true, DELIMITER ',');`
+// //   )
+// //   return;
+// // };
+
+// // seedPostgresSummary('summary', 'summary');
+
+
+
+// function seedDatabase() {
+//   let csvData = [];
+//   console.log(csvData)
+//   return (
+//     fastcsv
+//     .parse()
+//     .validate((data) => !contains(data[0], ','))
+//     .on('data', (data) => {
+//       csvData.push(data);
+//     })
+//     .on('data-invalid', (row, rowNumber) =>
+//       console.log(`Invalid [rowNumber=${rowNumber}] [row=${JSON.stringify(row)}]`)
+//     )
+//   )
+//   .on('end', () => {
+//     const query = `COPY summary (summary, short_summary, copyright) FROM '${currentDirectory}/summaries.csv' WITH (FORMAT CSV, DELIMITER ',');`
+
+
+//     db.connect((err,client, done) => {
+//       if (err) throw err;
+
+//       try {
+//         client.query(query)
+//           .then((res) => {
+//             console.log('done')
+//           })
+//           .catch((err) => {
+//             console.log(err);
+//           })
+
+//       } finally {
+//         done();
+//       }
+//     })
+//   })
+// }
+// async function seed() {
+//   await writeToCsvFile();
+//   console.log('written')
+//   let stream = fs.createReadStream(filename);
+//   stream.pipe(seedDatabase())
+// }
+
+
+// seed();
+
+
+
+
+// CREATE TABLE summary (
+//   bookId serial PRIMARY KEY,
+//   summary TEXT,
+//   short_summary TEXT,
+//   copyright VARCHAR (50)
+// )
+
+const fs = require("fs");
+const Pool = require("pg").Pool;
+const pgp = require('pg-promise')()
+const fastcsv = require("fast-csv");
 const LoremIpsum = require('lorem-ipsum').LoremIpsum;
-const db = require('./postgres.js');
-const contains = require('validator/lib/contains');
-// const { Summary, mongoose } = require('./index.js');
-const fs = require('fs');
 const filename = 'summary.csv';
 const stream = fs.createWriteStream(filename);
-const fastcsv = require('fast-csv')
-const args = require('minimist')(process.argv.slice(2));
 
+const pool = new Pool({
+  host: '3.17.37.49',
+  user:'postgres',
+  database:'postgres',
+  password:'postgres',
+  port: 5432
+});
 
 const lorem = new LoremIpsum({
   sentencesPerParagraph: {
@@ -21,8 +193,10 @@ const lorem = new LoremIpsum({
   suffix: " "
 });
 
+
+
 const createSummary = () => {
-  // for (let i = 0; i < 100; i++) {
+
   const paragraphLength = Math.floor(Math.random() * 2 + 2);
   const shortSummarySentenceLength = Math.floor(Math.random() * 4 + 3);
   const copyrightWordsLength = Math.floor(Math.random() * 2 + 2);
@@ -34,149 +208,61 @@ const createSummary = () => {
   const copyright = '©' + year + ' ' + lorem.generateWords(copyrightWordsLength) + ' (P)' + (year + Math.floor(Math.random() * 5 + 4)) + ' ' + lorem.generateWords(copyrightWordsLength);
   let row = `${summary},${short_summary},${copyright}\n`;
   return row;
-  // }
+
 };
 
+const summary = new pgp.helpers.ColumnSet
+
 function writeToCsvFile() {
-  let rows = 10000000;
+  let rows = 1000000;
   for (let index = 0; index <= rows; index++) {
     stream.write(createSummary(), 'utf-8')
   }
   stream.end();
 }
 
-// const seedCSV = (writeStream, encoding, done) => {
-//   let i = lines;
-//   function write() {
-//     let canWrite = true;
-//     do {
-//       i--;
-//       let summary = createSummary(i);
-//       if (i===0) {
-//         writeStream.write(summary, encoding, done)
-//       } else {
-//         writeStream.write(summary, encoding)
-//       }
-//     } while (i > 0 && canWrite);
-//     if (i > 0 && !canWrite) {
-//       writeStream.once('drain', writing);
-//     }
-//   }
-//   write();
-// };
-
-function seedDatabase() {
-  let csvData = [];
-  return (
-    fastcsv
-    .parse()
-    .validate((data) => !contains(data[0], ','))
-    .on('data', (data) => {
-      csvData.push(data);
-    })
-    .on('data-invalid', (row, rowNumber) =>
-      console.log(`Invalid [rowNumber=${rowNumber}] [row=${JSON.stringify(row)}]`)
-    )
-  )
-  .on('end', () => {
-    const query = "COPY summary (summary, short_summary, copyright) FROM '/Users/alonzosanchez/sdc/Summary-Service/summary.csv' WITH (FORMAT CSV, DELIMITER ',');"
-    // const query = 'INSERT INTO Summaries (id, summary, short_summary, copyright) VALUES ($1, $2, $3, $4)';
-
-    db.connect((err,client, done) => {
-      if (err) throw err;
-
-      try {
-        client.query(query, (err, res) => {
-          if(err) {
-            console.log('err here', err.stack)
-          } else {
-            console.log('inserted data')
-          }
-        });
-        // csvData.forEach((row) => {
-        //   client.query(query, row, (err,res) => {
-        //     if(err) {
-        //       console.log(row);
-        //       console.log('the error is here', err.stack);
-        //     } else {
-        //       console.log('inserted ' + res.rowCount + ' row:', row);
-        //     }
-        //   });
-        // });
-      } finally {
-        done();
-      }
-    })
-  })
-}
 async function seed() {
   await writeToCsvFile();
-  let stream = fs.createReadStream(filename);
-  stream.pipe(seedDatabase())
+  console.log('written')
+  let streams = fs.createReadStream("summary.csv");
+  let csvData = [];
+
+  let csvStream = fastcsv
+    .parse()
+    .on("data", function(data) {
+      csvData.push(data);
+    })
+    .on("end", function() {
+      const pool = new Pool({
+          host: '3.17.37.49',
+          user:'postgres',
+          database:'postgres',
+          password:'postgres',
+          port: 5432
+        });
+
+      const query =
+        "INSERT INTO summary (summary, short_summary, copyright) VALUES ($1, $2, $3)";
+
+      pool.connect((err, client, done) => {
+        if (err) throw err;
+
+        try {
+          csvData.forEach(row => {
+            client.query(query, row, (err, res) => {
+              if (err) {
+                console.log(err.stack);
+              }
+            });
+          });
+        } finally {
+          done();
+        }
+      });
+    });
+
+  streams.pipe(csvStream);
 }
-
-// stream.write('id,summary,short_summary,copyright\n', 'utf-8');
-// seedCSV(stream, 'utf-8', () => {
-//   stream.end();
-// });
-
-// const seeding = () => {
-//   for (let i = 0; i < 10; i++) {
-//     console.log('whats up');
-//     seed();
-//     console.log('ran')
-//   }
-//   return;
-// }
-
-// seeding();
 
 seed();
 
-
-
-// let save = (summaryData, callback) => {
-//   const query = { 'id': summaryData.id };
-//   const update = { $set: {'id': summaryData.id, 'summary': summaryData.summary, 'short_summary': summaryData.short_summary, 'copyright': summaryData.copyright } };
-//   const options = { upsert: true };
-//   Summary.updateOne(query, update, options, callback);
-// };
-
-// for (let i = 0; i < 100; i++) {
-//   const paragraphLength = Math.floor(Math.random() * 2 + 2);
-//   const shortSummarySentenceLength = Math.floor(Math.random() * 4 + 3);
-//   const copyrightWordsLength = Math.floor(Math.random() * 2 + 2);
-//   const summary = lorem.generateParagraphs(paragraphLength);
-//   const short_summary = lorem.generateSentences(shortSummarySentenceLength);
-//   const year = Math.floor(Math.random() * 81) + 1940;
-//   const copyright = '©' + year + ' ' + lorem.generateWords(copyrightWordsLength) + ' (P)' + (year + Math.floor(Math.random() * 5 + 4)) + ' ' + lorem.generateWords(copyrightWordsLength);
-
-//   const summaryData = {
-//     id: i,
-//     summary: summary,
-//     short_summary: short_summary,
-//     copyright: copyright
-//   };
-//   save(summaryData, function(err, res) {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       console.log(i, ': ' + JSON.stringify(res));
-//       if (i === 99) {
-//         mongoose.connection.close();
-//         process.exit();
-//       }
-//     }
-//   });
-
-
-
-// }
-CREATE TABLE summary (
-  bookId serial PRIMARY KEY,
-  summary TEXT,
-  short_summary TEXT,
-  copyright VARCHAR (50)
-)
-
-// D

@@ -20,6 +20,7 @@ app.get('/api/summary/:bookId', (req, res) => {
 
   pool.query(query)
   .then((response) => {
+    console.log(response)
     res.send(response.rows)
   })
   .catch(err => console.error(err))
